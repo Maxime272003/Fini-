@@ -223,11 +223,12 @@
         </div>
 
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="grid" use:fadeEdges ondragover={(e) => dragId && e.preventDefault()} ondrop={(e) => e.preventDefault()}>
+        <div class="grid" class:editing={!!editingId || adding} use:fadeEdges ondragover={(e) => dragId && e.preventDefault()} ondrop={(e) => e.preventDefault()}>
           {#each todo as task, i (task.id)}
             <div
               class="slot"
               class:ghost={flyer?.task.id === task.id}
+              class:is-editing={editingId === task.id}
               class:dragging={dragId === task.id}
               bind:this={cardEls[task.id]}
               animate:flip={{ duration: motionOn() ? 360 : 0, easing: cubicOut }}
@@ -245,7 +246,6 @@
                   initial={task.text}
                   {color}
                   badge={pad(i)}
-                  hint="Entrée pour valider · Échap"
                   onsubmit={(text) => {
                     app.mutate((d) => updateTaskText(d, task.id, text));
                     editingId = null;
@@ -271,12 +271,14 @@
           {/each}
 
           {#if adding}
-            <CardEditor
-              {color}
-              badge={pad(todo.length)}
-              onsubmit={(text) => app.mutate((d) => addTask(d, projectId, text))}
-              oncancel={() => (adding = false)}
-            />
+            <div in:deal={{ distance: 80 }}>
+              <CardEditor
+                {color}
+                badge={pad(todo.length)}
+                onsubmit={(text) => app.mutate((d) => addTask(d, projectId, text))}
+                oncancel={() => (adding = false)}
+              />
+            </div>
           {:else}
             <button class="new" onclick={() => (adding = true)}>
               <Icon name="plus" size={28} stroke={2.6} />
@@ -464,6 +466,16 @@
   }
   .slot.ghost {
     visibility: hidden;
+  }
+  /* Pendant l'écriture d'une carte, les autres passent au second plan. */
+  .slot,
+  .new {
+    transition: opacity 0.2s ease, filter 0.2s ease;
+  }
+  .grid.editing .slot:not(.is-editing),
+  .grid.editing .new {
+    opacity: 0.4;
+    filter: saturate(0.6);
   }
   .slot.dragging {
     opacity: 0.35;
