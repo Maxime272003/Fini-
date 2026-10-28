@@ -51,6 +51,13 @@
     el.focus();
     el.select();
   }
+
+  // En changeant d'étape, le champ du nom disparaît : le focus passe au bouton principal
+  // pour que Entrée continue d'avancer.
+  let primary = $state<HTMLButtonElement>();
+  $effect(() => {
+    if (step > 1) primary?.focus();
+  });
 </script>
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && close()} />
@@ -174,7 +181,7 @@
             {:else}
               <button type="button" class="btn" onclick={() => step--}>Retour</button>
             {/if}
-            <button type="submit" class="btn primary" disabled={!named}>
+            <button type="submit" class="btn primary" disabled={!named} bind:this={primary}>
               {existing ? 'Enregistrer' : step < STEPS.length ? 'Suivant' : 'Créer le deck'}
             </button>
           </div>

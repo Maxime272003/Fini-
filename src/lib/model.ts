@@ -68,6 +68,16 @@ export function updateProject(d: Data, id: string, patch: Partial<Pick<Project, 
   if (patch.back !== undefined) p.back = patch.back;
 }
 
+/** Déplace un deck à la position `toIndex` dans la liste des decks. */
+export function moveProject(d: Data, id: string, toIndex: number): void {
+  const list = sortedProjects(d);
+  const p = list.find((x) => x.id === id);
+  if (!p) return;
+  const rest = list.filter((x) => x !== p);
+  rest.splice(Math.max(0, Math.min(toIndex, rest.length)), 0, p);
+  rest.forEach((x, k) => (x.order = k));
+}
+
 /** Supprime le deck et toutes ses cartes. */
 export function deleteProject(d: Data, id: string): void {
   d.projects = d.projects.filter((p) => p.id !== id);

@@ -5,10 +5,12 @@ import {
   deleteProject,
   doneTasks,
   emptyData,
+  moveProject,
   moveTask,
   nextColor,
   normalize,
   setDone,
+  sortedProjects,
   todoTasks
 } from './model';
 import { cardTextSize } from './text';
@@ -78,6 +80,16 @@ describe('decks', () => {
     deleteProject(d, p.id);
     expect(d.projects.map((x) => x.name)).toEqual(['Autre']);
     expect(d.tasks.map((t) => t.text)).toEqual(['x']);
+  });
+
+  it('range un deck à une autre place', () => {
+    const d = emptyData();
+    const [a, b, c] = ['A', 'B', 'C'].map((n) => addProject(d, n, '#3D7BFF'));
+    moveProject(d, c.id, 0);
+    expect(sortedProjects(d).map((p) => p.name)).toEqual(['C', 'A', 'B']);
+    moveProject(d, c.id, 9);
+    expect(sortedProjects(d).map((p) => p.name)).toEqual(['A', 'B', 'C']);
+    expect([a, b, c].map((p) => p.order)).toEqual([0, 1, 2]);
   });
 
   it('propose une couleur pas encore prise', () => {
