@@ -48,6 +48,14 @@ ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik p
    - Pas d'export (présentation à l'écran).
 6. **Mode compact** : petite fenêtre (≈ 380 × 640) qu'on peut garder au premier plan (épingle), sélecteur de deck,
    cartes en jeu en mini-format, saisie rapide d'une nouvelle carte, pile « FINI · n ».
+   S'ouvre et se ferme avec le raccourci global `Ctrl+Alt+F`.
+7. **Réglages** (bouton engrenage sur l'accueil), enregistrés automatiquement :
+   - **Démarrage** : lancer Fini au démarrage de Windows (oui/non). Si oui, choisir comment il s'ouvre :
+     fenêtre principale, mode compact, ou en arrière-plan (rien ne s'affiche, icône dans la zone de notification).
+   - **Fenêtre** : quand on ferme la fenêtre, réduire dans la zone de notification ou quitter Fini ;
+     mode compact toujours au premier plan (oui/non) ; raccourci du mode compact (modifiable).
+   - **Affichage** : réduire les animations (la carte se retourne sans voler jusqu'à la défausse).
+   - **Données** : emplacement du fichier et bouton « Ouvrir le dossier ».
 
 ## 4. Exigences fonctionnelles
 
@@ -62,13 +70,22 @@ ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik p
 | F7 | Récap par semaine, tous decks confondus | Indispensable |
 | F8 | Mode compact, avec « toujours au premier plan » | Important |
 | F9 | L'app rouvre le dernier écran et la dernière taille de fenêtre | Bonus |
+| F10 | Lancement au démarrage de Windows, avec le mode d'ouverture choisi (fenêtre, compact, arrière-plan) | Indispensable |
+| F11 | Icône dans la zone de notification : ouvrir Fini, ouvrir le mode compact, quitter | Indispensable |
+| F12 | Raccourci global `Ctrl+Alt+F` pour le mode compact, modifiable dans les réglages | Important |
+| F13 | Comportement à la fermeture de la fenêtre : réduire dans la zone de notification ou quitter | Important |
+| F14 | Option « Réduire les animations » | Bonus |
 
-Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-tâches, notifications, export.
+Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-tâches, notifications, export,
+son, défausse « étalée » (une seule pile en v1), changement du dossier de données.
 
 ## 5. Exigences techniques
 
 - **Plateforme** : Windows 10/11.
-- **Stack** : Tauri 2 + Vite + TypeScript. Exécutable léger (~5–10 Mo). Rust n'est nécessaire que pour compiler.
+- **Stack** : Tauri 2 + Vite + Svelte + TypeScript. Exécutable léger (~5–10 Mo). Rust n'est nécessaire que pour compiler.
+  - Plugins Tauri : `autostart` (démarrage avec Windows), `global-shortcut` (raccourci), `fs` (fichier de données),
+    `opener` (ouvrir le dossier), icône de zone de notification (tray, intégrée à Tauri 2).
+  - Au lancement automatique, l'app reçoit un argument (`--autostart`) pour appliquer le mode d'ouverture choisi.
 - **Stockage** : un fichier JSON local, `%USERPROFILE%\Documents\Fini\fini.json`, créé au premier lancement.
   - Écriture atomique (fichier temporaire puis renommage) après chaque modification.
   - Copie de sauvegarde `fini.backup.json` au démarrage.
@@ -94,16 +111,26 @@ Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-t
       "doneAt": null,
       "createdAt": "2026-10-20T10:12:00Z"
     }
-  ]
+  ],
+  "settings": {
+    "launchAtStartup": true,
+    "startupMode": "tray",
+    "closeAction": "tray",
+    "compactAlwaysOnTop": true,
+    "compactShortcut": "Ctrl+Alt+F",
+    "reduceMotion": false
+  }
 }
 ```
+
+- `startupMode` : `"window"` | `"compact"` | `"tray"`. `closeAction` : `"tray"` | `"quit"`.
 
 - `doneAt` est rempli quand la carte est finie et vidé si elle revient en jeu. Le récap s'appuie dessus.
 - Supprimer un deck supprime ses cartes. Il n'y a pas de corbeille en v1.
 
-## 6. Points ouverts
+## 6. Décisions
 
-- Framework front : TypeScript sans framework ou un framework léger (Preact / Svelte).
-- Affichage de la défausse : une seule pile, ou bien un bouton « Étaler » pour voir toutes les cartes finies du deck.
-- Raccourci clavier global pour ouvrir le mode compact.
-- Un son discret au retournement d'une carte ?
+- Framework front : **Svelte**.
+- Défausse : **une seule pile** en v1.
+- Raccourci global du mode compact : **`Ctrl+Alt+F`**.
+- **Aucun son.**
