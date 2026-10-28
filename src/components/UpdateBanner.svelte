@@ -5,8 +5,10 @@
   import Icon from './Icon.svelte';
 
   const u = $derived(app.update);
+  // Pas de bandeau dans les réglages : la section « Mises à jour » propose déjà le bouton.
   const visible = $derived(
-    u.status === 'installing' || (u.status === 'available' && !app.updateDismissed)
+    app.view.name !== 'settings' &&
+      (u.status === 'installing' || (u.status === 'available' && !app.updateDismissed))
   );
 </script>
 
@@ -35,9 +37,10 @@
   .banner {
     position: fixed;
     right: 24px;
-    bottom: 24px;
+    /* Au-dessus de la barre du bas (chemin du fichier, version) pour ne rien masquer. */
+    bottom: 60px;
     z-index: 60;
-    max-width: 520px;
+    max-width: calc(100vw - 48px);
     background: var(--surface);
     border-radius: 14px;
     box-shadow: 0 6px 0 var(--shadow), 0 0 0 2px var(--accent);
@@ -64,6 +67,7 @@
     flex-direction: column;
     gap: 4px;
     font-size: 14px;
+    white-space: nowrap;
   }
   .muted {
     font-size: 13px;
