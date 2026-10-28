@@ -20,7 +20,7 @@ Maquettes : https://claude.ai/artifact/14qc1KPLV62zjKYmG9PjJg
 | Récap hebdo | **Deck** de toutes les cartes finies de la semaine, qu'on déroule |
 
 Style : cartes à collectionner modernes (esprit Balatro / Hearthstone). Fond violet nuit, cartes à cadre coloré,
-ombres franches, typo pixel (Pixelify Sans) pour les titres et Rubik pour le texte.
+ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik pour le texte. Pas de police pixel.
 
 ## 3. Écrans
 
@@ -29,8 +29,12 @@ ombres franches, typo pixel (Pixelify Sans) pour les titres et Rubik pour le tex
 2. **Nouveau deck / modifier un deck** (fenêtre modale) : nom, couleur du dos des cartes (6 couleurs), aperçu.
    En modification : bouton « Supprimer le deck » avec confirmation.
 3. **Plateau d'un projet** : zone « En jeu » (cartes à faire) + défausse (cartes finies, la dernière visible).
-   - Clic sur une carte → elle se retourne et part dans la défausse.
-   - Clic sur la carte du dessus de la défausse → elle revient en jeu (annuler).
+   - Clic sur une carte → elle se retourne et part dans la défausse, avec une animation d'environ 0,7 s :
+     1. elle se soulève et se retourne (dos « FINI ✓ ») en 0,25 s ;
+     2. elle vole jusqu'à la défausse et grossit à sa taille en 0,45 s ;
+     3. la pile de la défausse fait un petit rebond à l'arrivée.
+     Les clics sont ignorés pendant l'animation.
+   - Clic sur la carte du dessus de la défausse → elle revient en jeu (annuler) et glisse depuis la droite jusqu'à sa place.
 4. **Plateau — édition** :
    - « Nouvelle carte » → carte vierge éditable sur place (Entrée pour poser, Échap pour annuler).
    - Menu « ⋯ » ou clic droit : modifier le texte, marquer comme finie, supprimer.
@@ -100,5 +104,5 @@ Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-t
 - Framework front : TypeScript sans framework ou un framework léger (Preact / Svelte).
 - Affichage de la défausse : une seule pile, ou bien un bouton « Étaler » pour voir toutes les cartes finies du deck.
 - Raccourci clavier global pour ouvrir le mode compact.
-- Animations : retournement de carte et distribution des cartes dans le récap (déjà prévus dans les maquettes),
-  avec un éventuel son discret ?
+- Un son discret au retournement d'une carte ?
+- Faire glisser les autres cartes pour combler la place laissée par une carte finie (pour l'instant, elles se recalent d'un coup).
