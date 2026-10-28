@@ -12,7 +12,7 @@
 
 {#if visible}
   <div class="banner" role="status" transition:fly={{ y: 40, duration: motionOn() ? 250 : 0 }}>
-    <span class="icon" aria-hidden="true"><Icon name="deck" size={20} /></span>
+    <span class="icon" aria-hidden="true"><Icon name="download" size={20} stroke={2.4} /></span>
     {#if u.status === 'installing'}
       <div class="txt">
         <strong>Mise à jour vers la version {u.version}…</strong>

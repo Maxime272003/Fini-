@@ -35,7 +35,7 @@
         Mode compact
       </button>
       <button class="btn primary" onclick={() => app.go({ name: 'recap' })}>
-        <Icon name="deck" />
+        <Icon name="fan" size={20} />
         Récap de la semaine
       </button>
     </div>
