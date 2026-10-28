@@ -1,0 +1,153 @@
+@import '@fontsource/lilita-one/400.css';
+@import '@fontsource/rubik/400.css';
+@import '@fontsource/rubik/500.css';
+@import '@fontsource/rubik/600.css';
+@import '@fontsource/rubik/700.css';
+
+:root {
+  --bg: #17122b;
+  --bar: #0f0b1e;
+  --surface: #221a3d;
+  --surface-2: #2a2148;
+  --surface-3: #2f2552;
+  --line: #3a2f63;
+  --line-strong: #4a3f72;
+  --text: #f4f0ff;
+  --muted: #b8aed8;
+  --soft: #d9d2f2;
+  --accent: #ffd23f;
+  --accent-edge: #b8901a;
+  --ink: #1d1830;
+  --ink-muted: #5e5677;
+  --paper: #fff7e8;
+  --paper-line: #d8cbb0;
+  --danger: #ff8a80;
+  --ok: #22c38e;
+  --shadow: #0b0816;
+  --display: 'Lilita One', system-ui, sans-serif;
+  --body: Rubik, system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+#app {
+  height: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  user-select: text;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+}
+
+.btn {
+  height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 0 var(--shadow);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--shadow);
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--ink);
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--accent-edge);
+}
+
+.btn.icon {
+  width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+.btn.ghost {
+  background: transparent;
+  box-shadow: none;
+}
+
+.btn.danger {
+  color: var(--danger);
+}
+
+.label {
+  font-family: var(--display);
+  font-size: 19px;
+  letter-spacing: 1px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Motif du dos des cartes, partagé par les decks, la défausse et le mode compact. */
+.card-back {
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 7px, transparent 7px 16px);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 5px;
+}
