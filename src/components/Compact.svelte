@@ -15,6 +15,7 @@
   const projects = $derived(sortedProjects(app.data));
   const project = $derived(projects.find((p) => p.id === app.compactProjectId));
   const color = $derived(project?.color ?? '#3D7BFF');
+  const back = $derived(project?.back ?? 'classic');
   const todo = $derived(project ? todoTasks(app.data, project.id) : []);
   const done = $derived(project ? doneTasks(app.data, project.id) : []);
   const total = $derived(todo.length + done.length);
@@ -121,7 +122,9 @@
       {#if done.length}
         <button
           class="mini done card-back"
-          style:background-color={color}
+          data-back={back}
+          style:--c={color}
+          style:--e={edgeOf(color)}
           aria-label="Remettre en jeu la dernière carte finie : {done.at(-1)?.text}"
           onclick={undoLast}
         >
@@ -274,6 +277,7 @@
     line-clamp: 4;
   }
   .done {
+    --u: 7px;
     color: #fff;
   }
   .frame {

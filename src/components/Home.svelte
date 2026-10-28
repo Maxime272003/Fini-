@@ -48,7 +48,7 @@
         <span class="stack">
           <span class="b3" style:background={d.edge}></span>
           <span class="b2" style:background={d.edge}></span>
-          <span class="front card-back" style:background-color={d.color}>
+          <span class="front card-back cover" data-back={d.back} style:--c={d.color} style:--e={d.edge}>
             <span class="frame">
               <span class="badge">
                 <span class="count">{d.todo}</span>

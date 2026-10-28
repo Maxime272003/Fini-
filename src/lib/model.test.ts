@@ -96,6 +96,7 @@ describe('decks', () => {
       settings: { reduceMotion: true }
     });
     expect(d.tasks.map((t) => t.id)).toEqual(['t1']);
+    expect(d.projects[0].back).toBe('classic');
     expect(d.settings.reduceMotion).toBe(true);
     expect(d.settings.compactShortcut).toBe('Ctrl+Alt+F');
   });

@@ -18,6 +18,7 @@
 
   const project = $derived(app.data.projects.find((p) => p.id === projectId));
   const color = $derived(project?.color ?? '#3D7BFF');
+  const back = $derived(project?.back ?? 'classic');
   const todo = $derived(todoTasks(app.data, projectId));
   const done = $derived(doneTasks(app.data, projectId));
   const top = $derived(done.at(-1));
@@ -181,7 +182,7 @@
       <span class="text {cardTextSize(task.text)}">{task.text}</span>
     </span>
   </span>
-  <span class="face back card-back" style:background-color={color}>
+  <span class="face back card-back" data-back={back} style:--c={color} style:--e={edgeOf(color)}>
     <span class="frame">
       <span class="seal"><Icon name="check" size={30} stroke={3.2} /></span>
       <span class="fini">FINI</span>
@@ -299,7 +300,9 @@
             <button
               class="top card-back"
               bind:this={topEl}
-              style:background-color={color}
+              data-back={back}
+              style:--c={color}
+              style:--e={edgeOf(color)}
               aria-label="Remettre en jeu : {top.text}"
               onclick={undo}
             >
@@ -336,7 +339,7 @@
   {/if}
 
   {#if spread}
-    <DiscardSpread tasks={done} {color} onclose={() => (spread = false)} />
+    <DiscardSpread tasks={done} {color} {back} onclose={() => (spread = false)} />
   {/if}
 
   {#if zoom}
@@ -521,6 +524,7 @@
     padding: 6px;
   }
   .back {
+    --u: 8.33px;
     padding: 8px;
     color: #fff;
     transform: rotateY(180deg);

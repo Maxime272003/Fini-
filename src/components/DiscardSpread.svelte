@@ -9,12 +9,17 @@
   import { setDone } from '../lib/model';
   import { motionOn } from '../lib/motion';
   import { cardTextSize, plural } from '../lib/text';
-  import type { Task } from '../lib/types';
+  import { edgeOf, type CardBack, type Task } from '../lib/types';
   import { doneDayLabel } from '../lib/week';
   import CardZoom from './CardZoom.svelte';
   import Icon from './Icon.svelte';
 
-  let { tasks, color, onclose }: { tasks: Task[]; color: string; onclose: () => void } = $props();
+  let {
+    tasks,
+    color,
+    back,
+    onclose
+  }: { tasks: Task[]; color: string; back: CardBack; onclose: () => void } = $props();
 
   const list = $derived([...tasks].reverse());
 
@@ -78,7 +83,9 @@
       {#each list as t (t.id)}
         <button
           class="card card-back"
-          style:background-color={color}
+          data-back={back}
+          style:--c={color}
+          style:--e={edgeOf(color)}
           aria-label="Remettre en jeu : {t.text}"
           animate:flip={{ duration: motionOn() ? 300 : 0, easing: cubicOut }}
           out:leave
@@ -151,6 +158,7 @@
     justify-items: center;
   }
   .card {
+    --u: 7.78px;
     width: 140px;
     height: 196px;
     border: 0;

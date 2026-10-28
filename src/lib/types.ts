@@ -5,6 +5,7 @@ export interface Project {
   id: string;
   name: string;
   color: string;
+  back: CardBack;
   order: number;
   createdAt: string;
 }
@@ -55,6 +56,19 @@ export const COLORS = [
   { hex: '#9B6BFF', edge: '#6A3FD1', name: 'Violet' },
   { hex: '#FF5A4F', edge: '#C2322A', name: 'Rouge' }
 ] as const;
+
+/** Motifs de dos de carte, dessinés en CSS (app.css, `.card-back[data-back=…]`). */
+export const BACKS = [
+  { id: 'harle', name: 'Arlequin' },
+  { id: 'wave', name: 'Seigaiha' },
+  { id: 'deco', name: 'Art déco' },
+  { id: 'cosmos', name: 'Constellation' },
+  { id: 'pixel', name: 'Arcade' },
+  { id: 'bauhaus', name: 'Bauhaus' },
+  { id: 'classic', name: 'Classique' }
+] as const;
+
+export type CardBack = (typeof BACKS)[number]['id'];
 
 export function edgeOf(hex: string): string {
   return COLORS.find((c) => c.hex === hex)?.edge ?? '#2A2148';

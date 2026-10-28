@@ -1,4 +1,4 @@
-import { COLORS, type Data, type Project, type Settings, type Task } from './types';
+import { BACKS, COLORS, type CardBack, type Data, type Project, type Settings, type Task } from './types';
 
 export const DEFAULT_SETTINGS: Settings = {
   launchAtStartup: false,
@@ -18,7 +18,10 @@ export function normalize(raw: unknown): Data {
   const d = emptyData();
   if (!raw || typeof raw !== 'object') return d;
   const r = raw as Partial<Data>;
-  if (Array.isArray(r.projects)) d.projects = r.projects.filter((p) => p && typeof p.id === 'string');
+  if (Array.isArray(r.projects))
+    d.projects = r.projects
+      .filter((p) => p && typeof p.id === 'string')
+      .map((p) => ({ ...p, back: BACKS.some((b) => b.id === p.back) ? p.back : 'classic' }));
   if (Array.isArray(r.tasks)) {
     const ids = new Set(d.projects.map((p) => p.id));
     d.tasks = r.tasks
@@ -44,11 +47,12 @@ export function sortedProjects(d: Data): Project[] {
   return [...d.projects].sort((a, b) => a.order - b.order);
 }
 
-export function addProject(d: Data, name: string, color: string, now = new Date()): Project {
+export function addProject(d: Data, name: string, color: string, back: CardBack = 'harle', now = new Date()): Project {
   const p: Project = {
     id: uid('p'),
     name: name.trim(),
     color,
+    back,
     order: d.projects.reduce((m, x) => Math.max(m, x.order + 1), 0),
     createdAt: now.toISOString()
   };
@@ -56,11 +60,12 @@ export function addProject(d: Data, name: string, color: string, now = new Date(
   return p;
 }
 
-export function updateProject(d: Data, id: string, patch: Partial<Pick<Project, 'name' | 'color'>>): void {
+export function updateProject(d: Data, id: string, patch: Partial<Pick<Project, 'name' | 'color' | 'back'>>): void {
   const p = d.projects.find((x) => x.id === id);
   if (!p) return;
   if (patch.name !== undefined) p.name = patch.name.trim();
   if (patch.color !== undefined) p.color = patch.color;
+  if (patch.back !== undefined) p.back = patch.back;
 }
 
 /** Supprime le deck et toutes ses cartes. */
