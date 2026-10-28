@@ -5,7 +5,9 @@
   import { app } from '../lib/app.svelte';
   import { addTask, doneTasks, setDone, sortedProjects, todoTasks } from '../lib/model';
   import { motionOn } from '../lib/motion';
-  import { plural } from '../lib/text';
+  import { cardTextSize, plural } from '../lib/text';
+  import type { Task } from '../lib/types';
+  import CardZoom from './CardZoom.svelte';
   import { edgeOf } from '../lib/types';
   import Icon from './Icon.svelte';
 
@@ -17,6 +19,24 @@
   const total = $derived(todo.length + done.length);
 
   let text = $state('');
+
+  const pad = (i: number) => String(i + 1).padStart(2, '0');
+
+  // Zoom au survol pour les cartes dont le texte est coupé (même principe que sur le plateau).
+  let zoom = $state<{ task: Task; badge: string; rect: DOMRect } | null>(null);
+  let zoomTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function showZoom(el: HTMLElement, task: Task, badge: string, delay: number) {
+    clearTimeout(zoomTimer);
+    const t = el.querySelector<HTMLElement>('.text');
+    if (!t || t.scrollHeight <= t.clientHeight + 1) return;
+    zoomTimer = setTimeout(() => (zoom = { task, badge, rect: el.getBoundingClientRect() }), delay);
+  }
+
+  function hideZoom() {
+    clearTimeout(zoomTimer);
+    zoom = null;
+  }
 
   function add(e: SubmitEvent) {
     e.preventDefault();
@@ -70,11 +90,15 @@
           aria-label="Finir : {t.text}"
           animate:flip={{ duration: motionOn() ? 300 : 0, easing: cubicOut }}
           out:shrink
-          onclick={() => app.mutate((d) => setDone(d, t.id, true))}
+          onclick={() => (hideZoom(), app.mutate((d) => setDone(d, t.id, true)))}
+          onmouseenter={(e) => showZoom(e.currentTarget, t, pad(i), 400)}
+          onmouseleave={hideZoom}
+          onfocus={(e) => e.currentTarget.matches(':focus-visible') && showZoom(e.currentTarget, t, pad(i), 0)}
+          onblur={hideZoom}
         >
           <span class="paper">
-            <span class="num" style:color={edgeOf(color)}>{String(i + 1).padStart(2, '0')}</span>
-            <span class="text">{t.text}</span>
+            <span class="num" style:color={edgeOf(color)}>{pad(i)}</span>
+            <span class="text {cardTextSize(t.text)}">{t.text}</span>
           </span>
         </button>
       {/each}
@@ -92,6 +116,10 @@
         </button>
       {/if}
     </div>
+
+    {#if zoom}
+      <CardZoom text={zoom.task.text} badge={zoom.badge} {color} rect={zoom.rect} />
+    {/if}
 
     <form class="add" onsubmit={add}>
       <label class="sr-only" for="quick-add">Nouvelle carte</label>
@@ -221,6 +249,13 @@
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+  .text.m,
+  .text.s {
+    font-size: 11.5px;
+    line-height: 1.25;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
   .done {
     color: #fff;

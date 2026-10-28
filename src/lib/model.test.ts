@@ -11,7 +11,16 @@ import {
   setDone,
   todoTasks
 } from './model';
+import { cardTextSize } from './text';
 import { doneInWeek, isoWeekNumber, weekRange } from './week';
+
+describe('taille du texte des cartes', () => {
+  it('réduit la police pour les longues descriptions', () => {
+    expect(cardTextSize('Reprendre la maquette')).toBe('l');
+    expect(cardTextSize('x'.repeat(110))).toBe('m');
+    expect(cardTextSize('x'.repeat(180))).toBe('s');
+  });
+});
 
 function deckWith(texts: string[]) {
   const d = emptyData();

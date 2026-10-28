@@ -6,9 +6,10 @@
   import { addTask, deleteTask, doneTasks, moveTask, setDone, todoTasks, updateTaskText } from '../lib/model';
   import { bump, deal, motionOn } from '../lib/motion';
   import { edgeOf, type Task } from '../lib/types';
-  import { plural } from '../lib/text';
+  import { cardTextSize, plural } from '../lib/text';
   import { formatShortDay } from '../lib/week';
   import CardEditor from './CardEditor.svelte';
+  import CardZoom from './CardZoom.svelte';
   import Icon from './Icon.svelte';
 
   let { projectId }: { projectId: string } = $props();
@@ -50,6 +51,7 @@
   function finish(task: Task, badge: string) {
     if (flyer) return;
     menu = null;
+    hideZoom();
     const el = cardEls[task.id];
     if (!motionOn() || !el || !pileEl) return commitDone(task.id);
     const a = el.getBoundingClientRect();
@@ -91,6 +93,30 @@
 
   const pad = (i: number) => String(i + 1).padStart(2, '0');
 
+  // --- Zoom au survol : seulement pour les cartes dont le texte est coupé ---
+
+  let zoom = $state<{ task: Task; badge: string; rect: DOMRect } | null>(null);
+  let zoomTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function isClipped(id: string): boolean {
+    const t = cardEls[id]?.querySelector<HTMLElement>('.front .text');
+    return !!t && t.scrollHeight > t.clientHeight + 1;
+  }
+
+  function showZoom(task: Task, badge: string, delay: number) {
+    clearTimeout(zoomTimer);
+    if (flyer || dragId || menu || editingId === task.id || !isClipped(task.id)) return;
+    zoomTimer = setTimeout(() => {
+      const el = cardEls[task.id];
+      if (el) zoom = { task, badge, rect: el.getBoundingClientRect() };
+    }, delay);
+  }
+
+  function hideZoom() {
+    clearTimeout(zoomTimer);
+    zoom = null;
+  }
+
   // --- Menu, édition, ajout ---
 
   let menu = $state<{ task: Task; badge: string; x: number; y: number } | null>(null);
@@ -101,6 +127,7 @@
     e.preventDefault();
     e.stopPropagation();
     if (flyer) return;
+    hideZoom();
     menu = {
       task,
       badge,
@@ -117,6 +144,7 @@
   function dragStart(e: DragEvent, id: string) {
     dragId = id;
     menu = null;
+    hideZoom();
     e.dataTransfer?.setData('text/plain', id);
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   }
@@ -154,8 +182,7 @@
   <span class="face front" style:background={color}>
     <span class="paper">
       <span class="badge" style:background={color}>{badge}</span>
-      <span class="text">{task.text}</span>
-      <span class="state">À FAIRE</span>
+      <span class="text {cardTextSize(task.text)}">{task.text}</span>
     </span>
   </span>
   <span class="face back card-back" style:background-color={color}>
@@ -214,6 +241,8 @@
               ondragover={(e) => dragOver(e, i, task.id)}
               ondragend={() => (dragId = null)}
               oncontextmenu={(e) => openMenu(e, task, pad(i))}
+              onmouseenter={() => showZoom(task, pad(i), 400)}
+              onmouseleave={hideZoom}
             >
               {#if editingId === task.id}
                 <CardEditor
@@ -233,6 +262,8 @@
                   aria-label="Finir : {task.text}"
                   onclick={() => finish(task, pad(i))}
                   onkeydown={(e) => cardKey(e, task, i)}
+                  onfocus={(e) => e.currentTarget.matches(':focus-visible') && showZoom(task, pad(i), 0)}
+                  onblur={hideZoom}
                 >
                   <span class="lift"><span class="inner">{@render faces(task, pad(i))}</span></span>
                 </button>
@@ -300,6 +331,10 @@
     >
       <span class="inner" class:flipped={flyer.phase !== 'start'}>{@render faces(flyer.task, flyer.badge)}</span>
     </div>
+  {/if}
+
+  {#if zoom}
+    <CardZoom text={zoom.task.text} badge={zoom.badge} {color} rect={zoom.rect} />
   {/if}
 
   {#if menu}
@@ -489,6 +524,7 @@
     align-items: center;
     justify-content: center;
   }
+  /* Plus le texte est long, plus il est petit (voir cardTextSize) ; au-delà, le zoom au survol prend le relais. */
   .text {
     font-size: 14px;
     font-weight: 500;
@@ -496,18 +532,19 @@
     overflow: hidden;
     overflow-wrap: anywhere;
     display: -webkit-box;
-    -webkit-line-clamp: 6;
-    line-clamp: 6;
+    -webkit-line-clamp: 7;
+    line-clamp: 7;
     -webkit-box-orient: vertical;
   }
-  .state {
-    margin-top: auto;
-    border-top: 2px dotted var(--paper-line);
-    padding-top: 8px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--ink-muted);
+  .text.m {
+    font-size: 12.5px;
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+  }
+  .text.s {
+    font-size: 11.5px;
+    -webkit-line-clamp: 9;
+    line-clamp: 9;
   }
   .frame {
     flex: 1;
