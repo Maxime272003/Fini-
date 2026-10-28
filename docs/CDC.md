@@ -32,7 +32,9 @@ ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik p
    - Clic sur une carte → elle se retourne et part dans la défausse, avec une animation d'environ 0,7 s :
      1. elle se soulève et se retourne (dos « FINI ✓ ») en 0,25 s ;
      2. elle vole jusqu'à la défausse et grossit à sa taille en 0,45 s ;
-     3. la pile de la défausse fait un petit rebond à l'arrivée.
+     3. la pile de la défausse fait un petit rebond à l'arrivée ;
+     4. les cartes restantes glissent pour combler la place, l'une après l'autre (0,36 s, 40 ms de décalage).
+     Pas de retournement parasite : l'état « retourné » est retiré sans transition.
      Les clics sont ignorés pendant l'animation.
    - Clic sur la carte du dessus de la défausse → elle revient en jeu (annuler) et glisse depuis la droite jusqu'à sa place.
 4. **Plateau — édition** :
@@ -105,4 +107,3 @@ Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-t
 - Affichage de la défausse : une seule pile, ou bien un bouton « Étaler » pour voir toutes les cartes finies du deck.
 - Raccourci clavier global pour ouvrir le mode compact.
 - Un son discret au retournement d'une carte ?
-- Faire glisser les autres cartes pour combler la place laissée par une carte finie (pour l'instant, elles se recalent d'un coup).
