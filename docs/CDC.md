@@ -75,6 +75,7 @@ ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik p
 | F12 | Raccourci global `Ctrl+Alt+F` pour le mode compact, modifiable dans les réglages | Important |
 | F13 | Comportement à la fermeture de la fenêtre : réduire dans la zone de notification ou quitter | Important |
 | F14 | Option « Réduire les animations » | Bonus |
+| F15 | Mise à jour automatique : chaque push sur `main` publie une version signée ; l'app la détecte (démarrage + toutes les 6 h), propose de l'installer et redémarre, sans réinstallation manuelle | Important |
 
 Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-tâches, notifications, export,
 son, défausse « étalée » (une seule pile en v1), changement du dossier de données.
@@ -84,7 +85,8 @@ son, défausse « étalée » (une seule pile en v1), changement du dossier de d
 - **Plateforme** : Windows 10/11.
 - **Stack** : Tauri 2 + Vite + Svelte + TypeScript. Exécutable léger (~5–10 Mo). Rust n'est nécessaire que pour compiler.
   - Plugins Tauri : `autostart` (démarrage avec Windows), `global-shortcut` (raccourci), `fs` (fichier de données),
-    `opener` (ouvrir le dossier), icône de zone de notification (tray, intégrée à Tauri 2).
+    `opener` (ouvrir le dossier), `updater` et `process` (mises à jour), icône de zone de notification (tray, intégrée à Tauri 2).
+  - Mises à jour publiées en Releases GitHub (dépôt public) ; installateurs signés, clé privée en secret GitHub.
   - Au lancement automatique, l'app reçoit un argument (`--autostart`) pour appliquer le mode d'ouverture choisi.
 - **Stockage** : un fichier JSON local, `%USERPROFILE%\Documents\Fini\fini.json`, créé au premier lancement.
   - Écriture atomique (fichier temporaire puis renommage) après chaque modification.

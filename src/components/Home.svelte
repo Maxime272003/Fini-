@@ -75,7 +75,7 @@
 
   <footer class="muted">
     <span>Sauvegarde locale : {path}</span>
-    <span>Fini v0.1</span>
+    <span>Fini {app.version}</span>
   </footer>
 </main>
 

@@ -1,6 +1,18 @@
+import type { Update } from '@tauri-apps/plugin-updater';
 import * as m from './model';
 import * as platform from './platform';
 import type { Data, Settings } from './types';
+import * as updater from './updater';
+
+const UPDATE_CHECK_EVERY = 6 * 60 * 60 * 1000;
+
+export type UpdateState =
+  | { status: 'idle' }
+  | { status: 'checking' }
+  | { status: 'uptodate' }
+  | { status: 'available'; version: string }
+  | { status: 'installing'; version: string; progress: number }
+  | { status: 'error'; message: string };
 
 export type View =
   | { name: 'home' }
@@ -20,8 +32,13 @@ class AppState {
   compact = $state(false);
   compactProjectId = $state<string | null>(null);
   shortcutError = $state(false);
+  version = $state('');
+  update = $state<UpdateState>({ status: 'idle' });
+  /** L'utilisateur a fermé le bandeau : on ne le réaffiche pas avant le prochain lancement. */
+  updateDismissed = $state(false);
 
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingUpdate: Update | null = null;
 
   get settings(): Settings {
     return this.data.settings;
@@ -44,6 +61,10 @@ class AppState {
     platform.onCloseRequested(() => this.closeWindow());
     await this.applyShortcut();
     await platform.syncAutostart(this.settings.launchAtStartup).catch(() => {});
+
+    this.version = await updater.currentVersion();
+    void this.checkForUpdate(true);
+    setInterval(() => void this.checkForUpdate(true), UPDATE_CHECK_EVERY);
 
     const auto = await platform.launchedAtStartup();
     if (auto && this.settings.startupMode === 'tray') return;
@@ -98,6 +119,35 @@ class AppState {
 
   private async applyShortcut(): Promise<void> {
     this.shortcutError = !(await platform.registerShortcut(this.settings.compactShortcut, () => void this.onShortcut()));
+  }
+
+  // --- Mises à jour ---
+
+  /** `silent` : vérification automatique, une erreur réseau ne s'affiche pas. */
+  async checkForUpdate(silent = false): Promise<void> {
+    if (this.update.status === 'installing') return;
+    if (!silent) this.update = { status: 'checking' };
+    try {
+      const found = await updater.findUpdate();
+      this.pendingUpdate = found;
+      this.update = found ? { status: 'available', version: found.version } : { status: 'uptodate' };
+    } catch (e) {
+      if (!silent) this.update = { status: 'error', message: String(e) };
+    }
+  }
+
+  async installUpdate(): Promise<void> {
+    const pending = this.pendingUpdate;
+    if (!pending) return;
+    await this.flush();
+    this.update = { status: 'installing', version: pending.version, progress: 0 };
+    try {
+      await updater.installUpdate(pending, (progress) => {
+        this.update = { status: 'installing', version: pending.version, progress };
+      });
+    } catch (e) {
+      this.update = { status: 'error', message: String(e) };
+    }
   }
 
   // --- Fenêtre ---

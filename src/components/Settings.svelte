@@ -6,6 +6,7 @@
   import Switch from './Switch.svelte';
 
   const s = $derived(app.settings);
+  const u = $derived(app.update);
 
   const modes: { id: StartupMode; label: string; hint: string }[] = [
     { id: 'window', label: 'Ouvrir la fenêtre principale', hint: 'Tes decks s’affichent directement.' },
@@ -106,6 +107,37 @@
           <Switch checked={s.reduceMotion} labelledby="l-motion" onchange={(v) => app.updateSettings({ reduceMotion: v })} />
         </div>
       </section>
+
+      <section aria-labelledby="s-update">
+        <h2 id="s-update">MISES À JOUR</h2>
+        <div class="row">
+          <div class="txt">
+            <span class="name">Version {app.version}</span>
+            <span class="muted desc" aria-live="polite">
+              {#if u.status === 'checking'}
+                Recherche en cours…
+              {:else if u.status === 'uptodate'}
+                Fini est à jour.
+              {:else if u.status === 'available'}
+                La version {u.version} est disponible.
+              {:else if u.status === 'installing'}
+                Installation de la version {u.version}… {Math.round(u.progress * 100)} %
+              {:else if u.status === 'error'}
+                Recherche impossible pour l’instant (pas de connexion ?).
+              {:else}
+                Fini vérifie tout seul au démarrage puis toutes les 6 heures.
+              {/if}
+            </span>
+          </div>
+          {#if u.status === 'available'}
+            <button class="btn primary" onclick={() => app.installUpdate()}>Mettre à jour</button>
+          {:else}
+            <button class="btn" disabled={u.status === 'checking' || u.status === 'installing'} onclick={() => app.checkForUpdate()}>
+              Rechercher
+            </button>
+          {/if}
+        </div>
+      </section>
     </div>
 
     <div class="col">
@@ -174,7 +206,7 @@
     </div>
   </div>
 
-  <footer class="muted">Fini v0.1</footer>
+  <footer class="muted">Fini {app.version}</footer>
 </div>
 
 <style>
@@ -350,6 +382,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: default;
   }
   .small-btn {
     margin-left: 4px;

@@ -1,7 +1,9 @@
 name: Build Windows
 
+# Les branches de travail : on vérifie que tout compile, sans publier ni signer (main passe par release.yml).
 on:
   push:
+    branches-ignore: [main]
   workflow_dispatch:
 
 jobs:
@@ -29,7 +31,7 @@ jobs:
           npm test
 
       - name: Installateur
-        run: npx tauri build
+        run: npx tauri build --config src-tauri/tauri.unsigned.conf.json
 
       - uses: actions/upload-artifact@v4
         with:
