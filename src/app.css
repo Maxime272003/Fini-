@@ -1,5 +1,4 @@
 @import '@fontsource/lilita-one/400.css';
-@import '@fontsource/press-start-2p/400.css';
 @import '@fontsource/rubik/400.css';
 @import '@fontsource/rubik/500.css';
 @import '@fontsource/rubik/600.css';
@@ -145,13 +144,6 @@ h2 {
   overflow: hidden;
   background-color: var(--c);
 }
-.card-back::before,
-.card-back::after {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  font-size: var(--k);
-}
 .card-back:not([data-back]),
 .card-back[data-back='classic'] {
   background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 7px, transparent 7px 16px);
@@ -186,7 +178,7 @@ h2 {
 .card-back[data-back='harle'] .badge::before {
   content: '';
   position: absolute;
-  inset: calc(1.1 * var(--k));
+  inset: calc(0.4 * var(--k));
   z-index: -1;
   border-radius: var(--k);
   background: var(--bg);
@@ -194,6 +186,14 @@ h2 {
   box-shadow:
     0 0 0 calc(0.4 * var(--k)) rgba(255, 255, 255, 0.75),
     0 0 0 calc(0.8 * var(--k)) var(--e);
+}
+
+.card-back[data-back='harle'] .badge .count {
+  font-size: calc(3.4 * var(--k));
+}
+.card-back[data-back='harle'] .badge .sub {
+  font-size: calc(0.85 * var(--k));
+  letter-spacing: calc(0.05 * var(--k));
 }
 
 /* Seigaiha : vagues japonaises en écailles, badge en soleil levant. */
@@ -266,167 +266,94 @@ h2 {
     0 0 0 calc(0.85 * var(--k)) var(--accent);
 }
 
-/* Constellation : ciel de nuit teinté, étoiles et orbites, badge en planète. */
-.card-back[data-back='cosmos'] {
-  background-image:
-    radial-gradient(circle, #fff calc(0.13 * var(--k)), transparent calc(0.19 * var(--k))),
-    radial-gradient(circle, rgba(255, 255, 255, 0.75) calc(0.08 * var(--k)), transparent calc(0.13 * var(--k))),
-    radial-gradient(circle, rgba(255, 255, 255, 0.45) calc(0.06 * var(--k)), transparent calc(0.1 * var(--k))),
-    radial-gradient(130% 90% at 50% 108%, var(--c) 0%, var(--e) 42%, #120d24 88%);
-  background-size:
-    calc(7.3 * var(--k)) calc(6.1 * var(--k)),
-    calc(3.7 * var(--k)) calc(4.3 * var(--k)),
-    calc(2.3 * var(--k)) calc(2.9 * var(--k)),
-    100% 100%;
-  background-position:
-    calc(1.1 * var(--k)) calc(2.3 * var(--k)),
-    calc(2.9 * var(--k)) calc(0.7 * var(--k)),
-    calc(0.4 * var(--k)) calc(1.6 * var(--k)),
-    0 0;
-}
-.card-back[data-back='cosmos']::before {
-  content: '';
-  left: 50%;
-  top: 50%;
-  width: 16em;
-  height: 6.4em;
-  margin: -3.2em 0 0 -8em;
-  border: 0.15em solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  transform: rotate(-22deg);
-}
-.card-back[data-back='cosmos']::after {
-  content: '';
-  left: 50%;
-  top: 50%;
-  width: 12.4em;
-  height: 12.4em;
-  margin: -6.2em 0 0 -6.2em;
-  border: 0.12em dashed rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-}
-.card-back[data-back='cosmos'] > .frame {
-  border-width: 2px;
-  border-color: rgba(255, 255, 255, 0.32);
-}
-.card-back[data-back='cosmos'] .badge {
-  background: radial-gradient(circle at 32% 28%, var(--w) 0, var(--c) 22%, var(--e) 55%, #120d24 100%);
-  box-shadow:
-    0 0 calc(2.6 * var(--k)) var(--c),
-    0 0 0 calc(0.2 * var(--k)) rgba(255, 255, 255, 0.55);
-  text-shadow: 0 1px 4px rgba(11, 8, 22, 0.85);
-}
-.card-back[data-back='cosmos'] .badge .sub {
-  color: #fff;
-}
-
-/* Arcade : grille de pixels, coins crénelés, envahisseurs 8 bits. */
-.card-back[data-back='pixel'] {
-  --notch: polygon(
-    var(--p) 0,
-    calc(100% - var(--p)) 0,
-    calc(100% - var(--p)) var(--p),
-    100% var(--p),
-    100% calc(100% - var(--p)),
-    calc(100% - var(--p)) calc(100% - var(--p)),
-    calc(100% - var(--p)) 100%,
-    var(--p) 100%,
-    var(--p) calc(100% - var(--p)),
-    0 calc(100% - var(--p)),
-    0 var(--p),
-    var(--p) var(--p)
-  );
-  --p: calc(0.45 * var(--k));
-  background-image:
-    linear-gradient(rgba(11, 8, 22, 0.14) calc(0.18 * var(--k)), transparent calc(0.18 * var(--k))),
-    linear-gradient(90deg, rgba(11, 8, 22, 0.14) calc(0.18 * var(--k)), transparent calc(0.18 * var(--k)));
-  background-size: calc(1.5 * var(--k)) calc(1.5 * var(--k));
-  background-position: calc(0.15 * var(--k)) calc(0.15 * var(--k));
-}
-.card-back[data-back='pixel']::before,
-.card-back[data-back='pixel']::after {
-  content: '';
-  left: calc(50% - 2.475em);
-  width: 0.45em;
-  height: 0.45em;
-  box-shadow:
-    0.9em 0, 3.6em 0, 1.35em 0.45em, 3.15em 0.45em, 0.9em 0.9em, 1.35em 0.9em, 1.8em 0.9em, 2.25em 0.9em,
-    2.7em 0.9em, 3.15em 0.9em, 3.6em 0.9em, 0.45em 1.35em, 0.9em 1.35em, 1.8em 1.35em, 2.25em 1.35em,
-    2.7em 1.35em, 3.6em 1.35em, 4.05em 1.35em, 0 1.8em, 0.45em 1.8em, 0.9em 1.8em, 1.35em 1.8em, 1.8em 1.8em,
-    2.25em 1.8em, 2.7em 1.8em, 3.15em 1.8em, 3.6em 1.8em, 4.05em 1.8em, 4.5em 1.8em, 0 2.25em, 0.9em 2.25em,
-    1.35em 2.25em, 1.8em 2.25em, 2.25em 2.25em, 2.7em 2.25em, 3.15em 2.25em, 3.6em 2.25em, 4.5em 2.25em,
-    0 2.7em, 0.9em 2.7em, 3.6em 2.7em, 4.5em 2.7em, 1.35em 3.15em, 1.8em 3.15em, 2.7em 3.15em, 3.15em 3.15em;
-}
-.card-back[data-back='pixel']::before {
-  top: 2.7em;
-  color: #fff;
-}
-.card-back[data-back='pixel']::after {
-  top: calc(100% - 6.3em);
-  color: var(--e);
-}
-.card-back[data-back='pixel'] > .frame {
-  border: var(--p) solid #fff;
-  border-radius: 0;
-  clip-path: var(--notch);
-}
-.card-back[data-back='pixel'] .badge {
-  width: calc(9.9 * var(--k));
-  height: calc(7.2 * var(--k));
-  gap: calc(0.7 * var(--k));
-  border: var(--p) solid #fff;
-  border-radius: 0;
-  box-shadow: none;
-  clip-path: var(--notch);
-}
-.card-back[data-back='pixel'] .badge .count {
-  font-family: 'Press Start 2P', monospace;
-  font-size: calc(2.6 * var(--k));
-  color: var(--accent);
-}
-.card-back[data-back='pixel'] .badge .sub {
-  font-family: 'Press Start 2P', monospace;
-  font-size: calc(0.62 * var(--k));
-  letter-spacing: 0;
-  color: #fff;
-}
-
-/* Bauhaus : petite affiche géométrique sur fond crème. */
-.card-back[data-back='bauhaus'] {
-  --scrim: rgba(29, 24, 48, 0.78);
-  --t: calc(6 * var(--k)) calc(6.3 * var(--k));
+/* Rosace : cercles fins qui se croisent, comme un guilloché de billet. */
+.card-back[data-back='rosace'] {
+  --ring: transparent 0 calc(0.55 * var(--k)), rgba(255, 255, 255, 0.2) calc(0.55 * var(--k)) calc(0.68 * var(--k));
   background:
-    repeating-linear-gradient(90deg, transparent 0 calc(5.9 * var(--k)), var(--ink) calc(5.9 * var(--k)) calc(6.1 * var(--k))) 0 0 / 100% 100%,
-    repeating-linear-gradient(transparent 0 calc(6.2 * var(--k)), var(--ink) calc(6.2 * var(--k)) calc(6.4 * var(--k))) 0 0 / 100% 100%,
-    radial-gradient(calc(6 * var(--k)) circle at 100% 100%, var(--c) 99%, transparent 100%) 0 0 / var(--t) no-repeat,
-    radial-gradient(calc(3 * var(--k)) circle at 50% 100%, var(--accent) 99%, transparent 100%) calc(6 * var(--k)) 0 / var(--t) no-repeat,
-    linear-gradient(var(--ink), var(--ink)) calc(6 * var(--k)) 0 / var(--t) no-repeat,
-    repeating-linear-gradient(90deg, var(--e) 0 calc(0.75 * var(--k)), transparent calc(0.75 * var(--k)) calc(1.5 * var(--k)))
-      calc(12 * var(--k)) 0 / var(--t) no-repeat,
-    linear-gradient(var(--e), var(--e)) 0 calc(6.3 * var(--k)) / var(--t) no-repeat,
-    radial-gradient(calc(6 * var(--k)) circle at 0 0, var(--ink) 99%, transparent 100%) calc(12 * var(--k)) calc(6.3 * var(--k)) / var(--t)
-      no-repeat,
-    radial-gradient(calc(3.15 * var(--k)) circle at 100% 50%, var(--c) 99%, transparent 100%) 0 calc(12.6 * var(--k)) / var(--t) no-repeat,
-    linear-gradient(var(--c), var(--c)) calc(12 * var(--k)) calc(12.6 * var(--k)) / var(--t) no-repeat,
-    radial-gradient(calc(1.6 * var(--k)) circle, var(--paper) 99%, transparent 100%) 0 calc(18.9 * var(--k)) / var(--t) no-repeat,
-    linear-gradient(var(--ink), var(--ink)) 0 calc(18.9 * var(--k)) / var(--t) no-repeat,
-    radial-gradient(calc(6 * var(--k)) circle at 0 100%, var(--e) 99%, transparent 100%) calc(6 * var(--k)) calc(18.9 * var(--k)) / var(--t)
-      no-repeat,
-    linear-gradient(135deg, var(--accent) 50%, transparent 50%) calc(12 * var(--k)) calc(18.9 * var(--k)) / var(--t) no-repeat,
-    var(--paper);
+    repeating-radial-gradient(circle at 50% 0, var(--ring)),
+    repeating-radial-gradient(circle at 50% 100%, var(--ring)),
+    radial-gradient(circle, var(--c) 40%, var(--e) 110%);
 }
-.card-back[data-back='bauhaus'] > .frame {
-  border-color: var(--ink);
-}
-.card-back[data-back='bauhaus'] .badge {
-  background: var(--ink);
-  color: var(--paper);
+.card-back[data-back='rosace'] > .frame {
+  border-color: rgba(255, 255, 255, 0.8);
   box-shadow:
-    0 0 0 calc(0.5 * var(--k)) var(--paper),
-    0 0 0 calc(0.85 * var(--k)) var(--ink);
+    inset 0 0 0 calc(0.4 * var(--k)) var(--e),
+    inset 0 0 0 calc(0.55 * var(--k)) rgba(255, 255, 255, 0.6);
 }
-.card-back[data-back='bauhaus'] .badge .sub {
-  color: var(--accent);
+.card-back[data-back='rosace'] .badge {
+  box-shadow:
+    0 0 0 calc(0.3 * var(--k)) rgba(255, 255, 255, 0.8),
+    0 0 0 calc(0.65 * var(--k)) var(--e),
+    0 0 0 calc(0.8 * var(--k)) rgba(255, 255, 255, 0.6);
+}
+
+/* Écossais : tartan deux tons, fines lignes claires et léger sergé. */
+.card-back[data-back='tartan'] {
+  --band: transparent 0 calc(1.5 * var(--k)), color-mix(in srgb, var(--e) 55%, transparent) calc(1.5 * var(--k)) calc(3.5 * var(--k)),
+    transparent calc(3.5 * var(--k)) calc(6 * var(--k));
+  --line: transparent 0 calc(5.2 * var(--k)), rgba(255, 255, 255, 0.4) calc(5.2 * var(--k)) calc(5.35 * var(--k)),
+    transparent calc(5.35 * var(--k)) calc(6 * var(--k));
+  --dark: transparent 0 calc(3.9 * var(--k)), rgba(11, 8, 22, 0.22) calc(3.9 * var(--k)) calc(4.3 * var(--k)),
+    transparent calc(4.3 * var(--k)) calc(6 * var(--k));
+  background:
+    repeating-linear-gradient(45deg, rgba(11, 8, 22, 0.07) 0 calc(0.15 * var(--k)), transparent calc(0.15 * var(--k)) calc(0.45 * var(--k))),
+    repeating-linear-gradient(90deg, var(--line)),
+    repeating-linear-gradient(0deg, var(--line)),
+    repeating-linear-gradient(90deg, var(--band)),
+    repeating-linear-gradient(0deg, var(--band)),
+    repeating-linear-gradient(90deg, var(--dark)),
+    repeating-linear-gradient(0deg, var(--dark)),
+    var(--c);
+}
+.card-back[data-back='tartan'] .badge {
+  box-shadow:
+    0 0 0 calc(0.4 * var(--k)) rgba(255, 255, 255, 0.75),
+    0 0 0 calc(0.75 * var(--k)) var(--e);
+}
+
+/* Chevrons : zigzags réguliers dans la teinte foncée. */
+.card-back[data-back='chevron'] {
+  --t: calc(3 * var(--k)) calc(3 * var(--k));
+  background:
+    linear-gradient(135deg, var(--e) 25%, transparent 25%) calc(-1.5 * var(--k)) 0 / var(--t),
+    linear-gradient(225deg, var(--e) 25%, transparent 25%) calc(-1.5 * var(--k)) 0 / var(--t),
+    linear-gradient(315deg, var(--e) 25%, transparent 25%) 0 0 / var(--t),
+    linear-gradient(45deg, var(--e) 25%, transparent 25%) 0 0 / var(--t),
+    var(--c);
+}
+.card-back[data-back='chevron'] .badge {
+  box-shadow:
+    0 0 0 calc(0.4 * var(--k)) rgba(255, 255, 255, 0.75),
+    0 0 0 calc(0.75 * var(--k)) var(--c);
+}
+
+/* Pois : pois clairs en quinconce, léger vignettage. */
+.card-back[data-back='dots'] {
+  --d: color-mix(in oklab, var(--c) 72%, #fff);
+  background-image:
+    radial-gradient(closest-side, transparent 55%, rgba(11, 8, 22, 0.25)),
+    radial-gradient(circle, var(--d) calc(0.5 * var(--k)), transparent calc(0.56 * var(--k))),
+    radial-gradient(circle, var(--d) calc(0.5 * var(--k)), transparent calc(0.56 * var(--k)));
+  background-size:
+    100% 100%,
+    calc(2.4 * var(--k)) calc(2.4 * var(--k)),
+    calc(2.4 * var(--k)) calc(2.4 * var(--k));
+  background-position: 0 0, 0 0, calc(1.2 * var(--k)) calc(1.2 * var(--k));
+}
+.card-back[data-back='dots'] > .frame {
+  border-color: #fff;
+}
+
+/* Damier : petit damier deux tons avec un reflet. */
+.card-back[data-back='checker'] {
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.14), transparent 45%) 0 0 / 100% 100%,
+    conic-gradient(var(--e) 25%, var(--c) 0 50%, var(--e) 0 75%, var(--c) 0) 0 0 / calc(2.4 * var(--k)) calc(2.4 * var(--k));
+}
+.card-back[data-back='checker'] .badge {
+  box-shadow:
+    0 0 0 calc(0.4 * var(--k)) rgba(255, 255, 255, 0.8),
+    0 0 0 calc(0.75 * var(--k)) var(--e);
 }
 
 .fade-edges {

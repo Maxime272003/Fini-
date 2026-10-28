@@ -54,7 +54,13 @@ export const COLORS = [
   { hex: '#22C38E', edge: '#128A62', name: 'Vert' },
   { hex: '#FF4FA0', edge: '#C22770', name: 'Rose' },
   { hex: '#9B6BFF', edge: '#6A3FD1', name: 'Violet' },
-  { hex: '#FF5A4F', edge: '#C2322A', name: 'Rouge' }
+  { hex: '#FF5A4F', edge: '#C2322A', name: 'Rouge' },
+  { hex: '#19C2D6', edge: '#0D8797', name: 'Turquoise' },
+  { hex: '#FFC93C', edge: '#C29110', name: 'Jaune' },
+  { hex: '#8FD14F', edge: '#5C9A22', name: 'Lime' },
+  { hex: '#C77B3A', edge: '#8A5020', name: 'Caramel' },
+  { hex: '#6E7FA3', edge: '#475673', name: 'Ardoise' },
+  { hex: '#A3264E', edge: '#6E1533', name: 'Bordeaux' }
 ] as const;
 
 /** Motifs de dos de carte, dessinés en CSS (app.css, `.card-back[data-back=…]`). */
@@ -62,9 +68,11 @@ export const BACKS = [
   { id: 'harle', name: 'Arlequin' },
   { id: 'wave', name: 'Seigaiha' },
   { id: 'deco', name: 'Art déco' },
-  { id: 'cosmos', name: 'Constellation' },
-  { id: 'pixel', name: 'Arcade' },
-  { id: 'bauhaus', name: 'Bauhaus' },
+  { id: 'rosace', name: 'Rosace' },
+  { id: 'tartan', name: 'Écossais' },
+  { id: 'chevron', name: 'Chevrons' },
+  { id: 'dots', name: 'Pois' },
+  { id: 'checker', name: 'Damier' },
   { id: 'classic', name: 'Classique' }
 ] as const;
 
