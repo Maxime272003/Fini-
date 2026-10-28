@@ -1,5 +1,6 @@
 <script lang="ts">
   import { app } from '../lib/app.svelte';
+  import { fadeEdges } from '../lib/fade';
   import { sortedProjects } from '../lib/model';
   import { dataFilePath } from '../lib/platform';
   import { plural } from '../lib/text';
@@ -41,7 +42,7 @@
     </div>
   </header>
 
-  <div class="grid">
+  <div class="grid" use:fadeEdges>
     {#each decks as d (d.id)}
       <button class="deck" onclick={() => app.go({ name: 'board', projectId: d.id })}>
         <span class="stack">

@@ -1,10 +1,12 @@
 import type { Update } from '@tauri-apps/plugin-updater';
 import * as m from './model';
 import * as platform from './platform';
-import type { Data, Settings } from './types';
+import type { Data, Project, Settings, Task } from './types';
 import * as updater from './updater';
 
 const UPDATE_CHECK_EVERY = 6 * 60 * 60 * 1000;
+/** Durée pendant laquelle une suppression peut être annulée. */
+const UNDO_DELAY = 6000;
 
 export type UpdateState =
   | { status: 'idle' }
@@ -36,9 +38,18 @@ class AppState {
   update = $state<UpdateState>({ status: 'idle' });
   /** L'utilisateur a fermé le bandeau : on ne le réaffiche pas avant le prochain lancement. */
   updateDismissed = $state(false);
+  /** Dernière suppression, annulable pendant quelques secondes. */
+  undo = $state<{ id: number; label: string } | null>(null);
+  /** Incrémenté pour demander au widget de placer le curseur dans « Nouvelle carte ». */
+  quickAddRequest = $state(0);
 
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingUpdate: Update | null = null;
+  private undoRestore: ((d: Data) => void) | null = null;
+  private undoTimer: ReturnType<typeof setTimeout> | undefined;
+  private geometryTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Vrai pendant qu'on redimensionne la fenêtre nous-mêmes : ces mouvements ne sont pas enregistrés. */
+  private applyingWindow = false;
 
   get settings(): Settings {
     return this.data.settings;
@@ -49,7 +60,7 @@ class AppState {
       const raw = await platform.loadRaw();
       this.data = m.normalize(raw ? JSON.parse(raw) : null);
     } catch (e) {
-      this.loadError = 'Impossible de lire fini.json : ' + String(e) + '. Une copie fini.backup.json existe dans le même dossier.';
+      this.loadError = 'Impossible de lire fini.json : ' + String(e) + '. Les copies des 7 derniers jours sont dans le sous-dossier backups.';
     }
     this.loaded = true;
 
@@ -59,6 +70,10 @@ class AppState {
       quit: () => void this.quit()
     });
     platform.onCloseRequested(() => this.closeWindow());
+    platform.onGeometryChange(() => {
+      clearTimeout(this.geometryTimer);
+      this.geometryTimer = setTimeout(() => void this.recordGeometry(), 500);
+    });
     await this.applyShortcut();
     await platform.syncAutostart(this.settings.launchAtStartup).catch(() => {});
 
@@ -69,6 +84,7 @@ class AppState {
     const auto = await platform.launchedAtStartup();
     if (auto && this.settings.startupMode === 'tray') return;
     if (auto && this.settings.startupMode === 'compact') await this.enterCompact();
+    else await this.applyWindowMode();
     await platform.show();
   }
 
@@ -121,6 +137,51 @@ class AppState {
     this.shortcutError = !(await platform.registerShortcut(this.settings.compactShortcut, () => void this.onShortcut()));
   }
 
+  // --- Suppressions annulables ---
+
+  deleteTask(id: string): void {
+    const task = this.data.tasks.find((t) => t.id === id);
+    if (!task) return;
+    const copy: Task = $state.snapshot(task);
+    this.mutate((d) => m.deleteTask(d, id));
+    this.offerUndo('Carte supprimée', (d) => {
+      if (d.projects.some((p) => p.id === copy.projectId)) d.tasks.push(copy);
+    });
+  }
+
+  deleteProject(id: string): void {
+    const project = this.data.projects.find((p) => p.id === id);
+    if (!project) return;
+    const copy: Project = $state.snapshot(project);
+    const tasks: Task[] = $state.snapshot(this.data.tasks.filter((t) => t.projectId === id));
+    this.mutate((d) => m.deleteProject(d, id));
+    if (this.view.name === 'board' && this.view.projectId === id) this.view = { name: 'home' };
+    this.offerUndo(`Deck « ${copy.name} » supprimé`, (d) => {
+      d.projects.push(copy);
+      d.tasks.push(...tasks);
+    });
+  }
+
+  undoLast(): void {
+    const restore = this.undoRestore;
+    if (!restore) return;
+    this.mutate(restore);
+    this.clearUndo();
+  }
+
+  clearUndo(): void {
+    clearTimeout(this.undoTimer);
+    this.undoRestore = null;
+    this.undo = null;
+  }
+
+  private offerUndo(label: string, restore: (d: Data) => void): void {
+    clearTimeout(this.undoTimer);
+    this.undoRestore = restore;
+    this.undo = { id: Date.now(), label };
+    this.undoTimer = setTimeout(() => this.clearUndo(), UNDO_DELAY);
+  }
+
   // --- Mises à jour ---
 
   /** `silent` : vérification automatique, une erreur réseau ne s'affiche pas. */
@@ -158,6 +219,37 @@ class AppState {
       return;
     }
     await this.openCompact();
+    // Ajout express : le curseur attend dans « Nouvelle carte ».
+    this.quickAddRequest++;
+  }
+
+  async hideWindow(): Promise<void> {
+    await platform.hide();
+  }
+
+  /** Place la fenêtre selon le mode courant, à sa dernière position connue. */
+  private async applyWindowMode(): Promise<void> {
+    const mode = this.compact ? 'compact' : 'full';
+    this.applyingWindow = true;
+    try {
+      await platform.setWindowMode(mode, this.data.window?.[mode], this.settings.compactAlwaysOnTop);
+    } finally {
+      // Les événements de déplacement arrivent un peu après : on les ignore encore un instant.
+      setTimeout(() => (this.applyingWindow = false), 600);
+    }
+  }
+
+  private async recordGeometry(): Promise<void> {
+    if (this.applyingWindow) return;
+    const g = await platform.readGeometry();
+    if (!g) return;
+    const mode = this.compact ? 'compact' : 'full';
+    this.mutate((d) => {
+      d.window ??= {};
+      const previous = d.window[mode];
+      // Agrandie : on garde la taille normale d'avant pour la restaurer au prochain lancement.
+      d.window[mode] = g.maximized && previous ? { ...previous, maximized: true } : g;
+    });
   }
 
   async enterCompact(projectId?: string): Promise<void> {
@@ -168,13 +260,13 @@ class AppState {
     }
     this.deckModal = null;
     this.compact = true;
-    await platform.setCompactWindow(true, this.settings.compactAlwaysOnTop);
+    await this.applyWindowMode();
   }
 
   async exitCompact(): Promise<void> {
     this.compact = false;
     if (this.compactProjectId) this.view = { name: 'board', projectId: this.compactProjectId };
-    await platform.setCompactWindow(false, false);
+    await this.applyWindowMode();
   }
 
   async openCompact(): Promise<void> {

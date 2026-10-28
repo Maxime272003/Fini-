@@ -1,5 +1,6 @@
 <script lang="ts">
   import { app } from '../lib/app.svelte';
+  import { fadeEdges } from '../lib/fade';
   import { dataFilePath, openDataDir } from '../lib/platform';
   import type { CloseAction, StartupMode } from '../lib/types';
   import Icon from './Icon.svelte';
@@ -67,7 +68,7 @@
     </div>
   </header>
 
-  <div class="columns">
+  <div class="columns" use:fadeEdges>
     <div class="col">
       <section aria-labelledby="s-start">
         <h2 id="s-start">DÉMARRAGE</h2>
@@ -201,7 +202,7 @@
             Ouvrir le dossier
           </button>
         </div>
-        <span class="muted desc">Une copie fini.backup.json est faite à chaque démarrage.</span>
+        <span class="muted desc">Une copie par jour est gardée 7 jours dans le sous-dossier backups.</span>
       </section>
     </div>
   </div>

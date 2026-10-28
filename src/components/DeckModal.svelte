@@ -1,6 +1,6 @@
 <script lang="ts">
   import { app } from '../lib/app.svelte';
-  import { addProject, deleteProject, nextColor, updateProject } from '../lib/model';
+  import { addProject, nextColor, updateProject } from '../lib/model';
   import { COLORS } from '../lib/types';
   import Icon from './Icon.svelte';
 
@@ -30,8 +30,7 @@
 
   function remove() {
     if (!existing) return;
-    app.mutate((d) => deleteProject(d, existing.id));
-    app.go({ name: 'home' });
+    app.deleteProject(existing.id);
     close();
   }
 

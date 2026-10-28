@@ -3,6 +3,7 @@
   import { cubicOut } from 'svelte/easing';
   import { scale } from 'svelte/transition';
   import { app } from '../lib/app.svelte';
+  import { fadeEdges } from '../lib/fade';
   import { addTask, doneTasks, setDone, sortedProjects, todoTasks } from '../lib/model';
   import { motionOn } from '../lib/motion';
   import { cardTextSize, plural } from '../lib/text';
@@ -19,6 +20,19 @@
   const total = $derived(todo.length + done.length);
 
   let text = $state('');
+  let input = $state<HTMLInputElement>();
+
+  // Ouvert par le raccourci : le curseur attend dans « Nouvelle carte ».
+  $effect(() => {
+    if (app.quickAddRequest) input?.focus();
+  });
+
+  // Échap referme le widget (il reste disponible dans la zone de notification et via le raccourci).
+  function keydown(e: KeyboardEvent) {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    hideZoom();
+    void app.hideWindow();
+  }
 
   const pad = (i: number) => String(i + 1).padStart(2, '0');
 
@@ -58,6 +72,8 @@
   }
 </script>
 
+<svelte:window onkeydown={keydown} />
+
 <div class="compact">
   {#if projects.length === 0}
     <div class="empty">
@@ -82,7 +98,7 @@
       </div>
     </div>
 
-    <div class="cards">
+    <div class="cards" use:fadeEdges>
       {#each todo as t, i (t.id)}
         <button
           class="mini"
@@ -123,7 +139,7 @@
 
     <form class="add" onsubmit={add}>
       <label class="sr-only" for="quick-add">Nouvelle carte</label>
-      <input id="quick-add" type="text" placeholder="Nouvelle carte…" maxlength="200" bind:value={text} />
+      <input id="quick-add" type="text" placeholder="Nouvelle carte…" maxlength="200" bind:value={text} bind:this={input} />
       <button class="go" aria-label="Poser la carte" disabled={!text.trim()}>
         <Icon name="plus" size={20} stroke={2.8} />
       </button>

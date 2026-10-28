@@ -133,6 +133,25 @@ h2 {
   background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 7px, transparent 7px 16px);
 }
 
+.fade-edges {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

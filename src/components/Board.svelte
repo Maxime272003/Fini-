@@ -3,13 +3,15 @@
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import { app } from '../lib/app.svelte';
-  import { addTask, deleteTask, doneTasks, moveTask, setDone, todoTasks, updateTaskText } from '../lib/model';
+  import { fadeEdges } from '../lib/fade';
+  import { addTask, doneTasks, moveTask, setDone, todoTasks, updateTaskText } from '../lib/model';
   import { bump, deal, motionOn } from '../lib/motion';
   import { edgeOf, type Task } from '../lib/types';
   import { cardTextSize, plural } from '../lib/text';
-  import { formatShortDay } from '../lib/week';
+  import { doneDayLabel } from '../lib/week';
   import CardEditor from './CardEditor.svelte';
   import CardZoom from './CardZoom.svelte';
+  import DiscardSpread from './DiscardSpread.svelte';
   import Icon from './Icon.svelte';
 
   let { projectId }: { projectId: string } = $props();
@@ -84,13 +86,6 @@
     app.mutate((d) => setDone(d, id, false));
   }
 
-  function dayLabel(iso: string | null): string {
-    if (!iso) return '';
-    const d = new Date(iso);
-    const now = new Date();
-    return d.toDateString() === now.toDateString() ? 'aujourd’hui' : formatShortDay(iso);
-  }
-
   const pad = (i: number) => String(i + 1).padStart(2, '0');
 
   // --- Zoom au survol : seulement pour les cartes dont le texte est coupé ---
@@ -122,6 +117,7 @@
   let menu = $state<{ task: Task; badge: string; x: number; y: number } | null>(null);
   let editingId = $state<string | null>(null);
   let adding = $state(false);
+  let spread = $state(false);
 
   function openMenu(e: MouseEvent, task: Task, badge: string) {
     e.preventDefault();
@@ -227,7 +223,7 @@
         </div>
 
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="grid" ondragover={(e) => dragId && e.preventDefault()} ondrop={(e) => e.preventDefault()}>
+        <div class="grid" use:fadeEdges ondragover={(e) => dragId && e.preventDefault()} ondrop={(e) => e.preventDefault()}>
           {#each todo as task, i (task.id)}
             <div
               class="slot"
@@ -308,12 +304,16 @@
               <span class="frame">
                 <span class="seal big"><Icon name="check" size={36} stroke={3.2} /></span>
                 <span class="fini big">FINI</span>
-                <span class="date">{dayLabel(top.doneAt)}</span>
+                <span class="date">{doneDayLabel(top.doneAt)}</span>
                 <span class="small-text">{top.text}</span>
               </span>
             </button>
           </div>
           <p class="muted pile-hint">Clique la carte du dessus pour la remettre en jeu.</p>
+          <button class="btn spread-btn" onclick={() => (spread = true)}>
+            <Icon name="fan" size={18} />
+            Étaler la défausse
+          </button>
         {:else}
           <div class="pile empty" bind:this={pileEl}>Les cartes finies atterrissent ici.</div>
         {/if}
@@ -333,6 +333,10 @@
     </div>
   {/if}
 
+  {#if spread}
+    <DiscardSpread tasks={done} {color} onclose={() => (spread = false)} />
+  {/if}
+
   {#if zoom}
     <CardZoom text={zoom.task.text} badge={zoom.badge} {color} rect={zoom.rect} />
   {/if}
@@ -347,7 +351,16 @@
         <Icon name="check" size={16} /> Marquer comme finie
       </button>
       <hr />
-      <button role="menuitem" class="danger" onclick={() => ((menu = null), app.mutate((d) => deleteTask(d, m.task.id)))}>
+      <button
+        role="menuitem"
+        class="danger"
+        onclick={() => {
+          // On lit la carte avant de fermer le menu : `m` suit `menu` et devient vide ensuite.
+          const id = m.task.id;
+          menu = null;
+          app.deleteTask(id);
+        }}
+      >
         <Icon name="trash" size={16} /> Supprimer la carte
       </button>
     </div>
@@ -724,6 +737,9 @@
     text-align: center;
     font-size: 13px;
     color: var(--muted);
+  }
+  .spread-btn {
+    height: 40px;
   }
   .pile-hint {
     margin: 0;

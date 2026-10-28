@@ -26,6 +26,7 @@ export function normalize(raw: unknown): Data {
       .map((t) => ({ ...t, done: !!t.done, doneAt: t.done ? (t.doneAt ?? null) : null }));
   }
   if (r.settings && typeof r.settings === 'object') d.settings = { ...DEFAULT_SETTINGS, ...r.settings };
+  if (r.window && typeof r.window === 'object') d.window = r.window;
   return d;
 }
 

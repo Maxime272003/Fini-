@@ -69,16 +69,19 @@ ombres franches, typo Lilita One (arrondie, épaisse) pour les titres et Rubik p
 | F6 | Réordonner les cartes en jeu (glisser-déposer) | Important |
 | F7 | Récap par semaine, tous decks confondus | Indispensable |
 | F8 | Mode compact, avec « toujours au premier plan » | Important |
-| F9 | L'app rouvre le dernier écran et la dernière taille de fenêtre | Bonus |
+| F9 | La grande fenêtre et le widget rouvrent à leur dernière position et taille (widget en bas à droite la première fois) | Important |
 | F10 | Lancement au démarrage de Windows, avec le mode d'ouverture choisi (fenêtre, compact, arrière-plan) | Indispensable |
 | F11 | Icône dans la zone de notification : ouvrir Fini, ouvrir le mode compact, quitter | Indispensable |
 | F12 | Raccourci global `Ctrl+Alt+F` pour le mode compact, modifiable dans les réglages | Important |
 | F13 | Comportement à la fermeture de la fenêtre : réduire dans la zone de notification ou quitter | Important |
 | F14 | Option « Réduire les animations » | Bonus |
+| F16 | Suppression d'une carte ou d'un deck annulable pendant 6 s (bouton « Annuler » ou Ctrl+Z) | Important |
+| F17 | Défausse étalée : voir toutes les cartes finies d'un deck et remettre n'importe laquelle en jeu | Important |
+| F18 | Ajout express : le raccourci ouvre le widget avec le curseur dans « Nouvelle carte », Échap le referme | Important |
 | F15 | Mise à jour automatique : chaque push sur `main` publie une version signée ; l'app la détecte (démarrage + toutes les 6 h), propose de l'installer et redémarre, sans réinstallation manuelle | Important |
 
 Hors périmètre v1 : comptes, synchronisation, échéances, étiquettes, sous-tâches, notifications, export,
-son, défausse « étalée » (une seule pile en v1), changement du dossier de données.
+son, changement du dossier de données.
 
 ## 5. Exigences techniques
 
@@ -90,7 +93,7 @@ son, défausse « étalée » (une seule pile en v1), changement du dossier de d
   - Au lancement automatique, l'app reçoit un argument (`--autostart`) pour appliquer le mode d'ouverture choisi.
 - **Stockage** : un fichier JSON local, `%USERPROFILE%\Documents\Fini\fini.json`, créé au premier lancement.
   - Écriture atomique (fichier temporaire puis renommage) après chaque modification.
-  - Copie de sauvegarde `fini.backup.json` au démarrage.
+  - Copie de sauvegarde quotidienne `backups/fini-AAAA-MM-JJ.json`, prise au premier lancement du jour ; les 7 dernières sont gardées.
   - Le dossier de données peut être changé plus tard (hors v1).
 - **Hors ligne** : aucune connexion réseau. Les polices sont embarquées dans l'app.
 - **Accessibilité** : toutes les actions sont faisables au clavier, focus visible, contraste AA.
@@ -133,6 +136,6 @@ son, défausse « étalée » (une seule pile en v1), changement du dossier de d
 ## 6. Décisions
 
 - Framework front : **Svelte**.
-- Défausse : **une seule pile** en v1.
+- Défausse : une pile, avec un bouton « Étaler la défausse » pour voir toutes les cartes finies.
 - Raccourci global du mode compact : **`Ctrl+Alt+F`**.
 - **Aucun son.**

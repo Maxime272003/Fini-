@@ -28,11 +28,22 @@ export interface Settings {
   reduceMotion: boolean;
 }
 
+/** Position et taille d'une fenêtre, en pixels physiques de l'écran. */
+export interface Geometry {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  maximized?: boolean;
+}
+
 export interface Data {
   version: 1;
   projects: Project[];
   tasks: Task[];
   settings: Settings;
+  /** Dernière position de la fenêtre normale et du widget compact. */
+  window?: { full?: Geometry; compact?: Geometry };
 }
 
 /** Couleurs de dos de carte : la teinte principale et son bord foncé (effet d'épaisseur). */

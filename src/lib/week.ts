@@ -52,6 +52,12 @@ export function formatShortDay(iso: string): string {
   return shortDay.format(new Date(iso));
 }
 
+/** « aujourd’hui » pour une carte finie aujourd'hui, sinon « mar. 27 oct. ». */
+export function doneDayLabel(iso: string | null, now = new Date()): string {
+  if (!iso) return '';
+  return new Date(iso).toDateString() === now.toDateString() ? 'aujourd’hui' : formatShortDay(iso);
+}
+
 /** Cartes finies dans la semaine, tous decks confondus, par date de fin croissante. */
 export function doneInWeek(d: Data, range: WeekRange): Task[] {
   const a = range.start.getTime();

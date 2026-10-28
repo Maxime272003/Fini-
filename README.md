@@ -34,7 +34,7 @@ dans les secrets du dépôt :
 Garde aussi une copie de cette clé privée en lieu sûr. Si elle est perdue, les versions déjà installées
 ne pourront plus se mettre à jour, il faudra réinstaller une fois avec une nouvelle clé.
 
-Tes données sont dans `Documents\Fini\fini.json` (copie de sécurité `fini.backup.json` à chaque démarrage).
+Tes données sont dans `Documents\Fini\fini.json` (une copie par jour dans `Documents\Fini\backups`, les 7 dernières sont gardées).
 
 ## Développer
 

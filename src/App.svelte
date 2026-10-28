@@ -7,6 +7,7 @@
   import Recap from './components/Recap.svelte';
   import Settings from './components/Settings.svelte';
   import TitleBar from './components/TitleBar.svelte';
+  import UndoToast from './components/UndoToast.svelte';
   import UpdateBanner from './components/UpdateBanner.svelte';
 </script>
 
@@ -39,6 +40,7 @@
 
   {#if !app.compact}
     <UpdateBanner />
+    <UndoToast />
   {/if}
 </div>
 
