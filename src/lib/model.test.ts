@@ -13,7 +13,7 @@ import {
   sortedProjects,
   todoTasks
 } from './model';
-import { cardTextSize } from './text';
+import { cardTextSize, cleanDroppedText } from './text';
 import { doneInWeek, isoWeekNumber, weekRange } from './week';
 
 describe('taille du texte des cartes', () => {
@@ -30,6 +30,18 @@ function deckWith(texts: string[]) {
   const tasks = texts.map((t) => addTask(d, p.id, t)!);
   return { d, p, tasks };
 }
+
+describe('texte glissé', () => {
+  it('nettoie les espaces et les lignes vides', () => {
+    expect(cleanDroppedText('  Appeler   le\tgarage \r\n\r\n\r\n\r\n demain ')).toBe('Appeler le garage\n\ndemain');
+  });
+  it('ignore un texte vide et coupe un texte trop long', () => {
+    expect(cleanDroppedText(' \n\t ')).toBeNull();
+    const long = cleanDroppedText('a'.repeat(500))!;
+    expect(long).toHaveLength(200);
+    expect(long.endsWith('…')).toBe(true);
+  });
+});
 
 describe('cartes', () => {
   it('ignore une carte vide', () => {

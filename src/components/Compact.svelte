@@ -6,7 +6,7 @@
   import { fadeEdges } from '../lib/fade';
   import { addTask, doneTasks, setDone, sortedProjects, todoTasks } from '../lib/model';
   import { motionOn } from '../lib/motion';
-  import { cardTextSize, plural } from '../lib/text';
+  import { cardTextSize, carriesText, cleanDroppedText, plural } from '../lib/text';
   import type { Task } from '../lib/types';
   import CardZoom from './CardZoom.svelte';
   import { edgeOf } from '../lib/types';
@@ -59,6 +59,25 @@
     const id = project.id;
     app.mutate((d) => addTask(d, id, text));
     text = '';
+  }
+
+  // Texte glissé sur « Nouvelle carte » depuis une autre application : la carte est posée aussitôt.
+  let dropping = $state(false);
+
+  function dropOver(e: DragEvent) {
+    if (!project || !carriesText(e)) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    dropping = true;
+  }
+
+  function dropText(e: DragEvent) {
+    dropping = false;
+    e.preventDefault();
+    const dropped = cleanDroppedText(e.dataTransfer?.getData('text/plain') ?? '');
+    if (!project || !dropped) return;
+    const id = project.id;
+    app.mutate((d) => addTask(d, id, dropped));
   }
 
   function undoLast() {
@@ -140,9 +159,16 @@
       <CardZoom text={zoom.task.text} badge={zoom.badge} {color} rect={zoom.rect} />
     {/if}
 
-    <form class="add" onsubmit={add}>
+    <form
+      class="add"
+      class:dropping
+      onsubmit={add}
+      ondragover={dropOver}
+      ondragleave={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && (dropping = false)}
+      ondrop={dropText}
+    >
       <label class="sr-only" for="quick-add">Nouvelle carte</label>
-      <input id="quick-add" type="text" placeholder="Nouvelle carte…" maxlength="200" bind:value={text} bind:this={input} />
+      <input id="quick-add" type="text" placeholder={dropping ? 'Lâche pour créer la carte' : 'Nouvelle carte…'} maxlength="200" bind:value={text} bind:this={input} />
       <button class="go" aria-label="Poser la carte" disabled={!text.trim()}>
         <Icon name="plus" size={20} stroke={2.8} />
       </button>
@@ -309,6 +335,10 @@
     display: flex;
     gap: 8px;
     border-top: 1px solid var(--surface-2);
+  }
+  .add.dropping input {
+    border-color: var(--accent);
+    border-style: dashed;
   }
   input {
     flex: 1;

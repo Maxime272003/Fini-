@@ -7,7 +7,7 @@
   import { addTask, doneTasks, moveTask, setDone, todoTasks, updateTaskText } from '../lib/model';
   import { bump, deal, motionOn } from '../lib/motion';
   import { edgeOf, type Task } from '../lib/types';
-  import { cardTextSize, plural } from '../lib/text';
+  import { cardTextSize, carriesText, cleanDroppedText, plural } from '../lib/text';
   import { doneDayLabel } from '../lib/week';
   import CardEditor from './CardEditor.svelte';
   import CardZoom from './CardZoom.svelte';
@@ -136,6 +136,23 @@
   // --- Réordonner : glisser-déposer, ou Alt+flèches au clavier ---
 
   let dragId = $state<string | null>(null);
+  // Texte glissé depuis une autre application sur « Nouvelle carte » : il devient une carte.
+  let dropping = $state(false);
+
+  function dropOver(e: DragEvent) {
+    if (dragId || !carriesText(e)) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+    dropping = true;
+  }
+
+  function dropText(e: DragEvent) {
+    dropping = false;
+    if (dragId) return;
+    e.preventDefault();
+    const text = cleanDroppedText(e.dataTransfer?.getData('text/plain') ?? '');
+    if (text) app.mutate((d) => addTask(d, projectId, text));
+  }
   let lastMove = 0;
 
   function dragStart(e: DragEvent, id: string) {
@@ -281,9 +298,16 @@
               />
             </div>
           {:else}
-            <button class="new" onclick={() => (adding = true)}>
+            <button
+              class="new"
+              class:dropping
+              onclick={() => (adding = true)}
+              ondragover={dropOver}
+              ondragleave={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && (dropping = false)}
+              ondrop={dropText}
+            >
               <Icon name="plus" size={28} stroke={2.6} />
-              <span>Nouvelle carte</span>
+              <span>{dropping ? 'Lâche pour créer' : 'Nouvelle carte'}</span>
             </button>
           {/if}
         </div>
@@ -659,6 +683,12 @@
     gap: 10px;
     font-weight: 600;
     font-size: 14px;
+  }
+  .new.dropping {
+    border-style: solid;
+    border-color: var(--accent);
+    color: #fff;
+    background: rgba(255, 210, 63, 0.08);
   }
   .new:hover {
     border-color: var(--accent);
